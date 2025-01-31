@@ -1,0 +1,9 @@
+{% extends "baseapp/base.html" %}
+{% load static %}
+{% block main_content %}
+
+{% for o in object %}
+<img src="{{o.image.url}}" alt="">
+{% endfor %}
+
+{% endblock main_content %}

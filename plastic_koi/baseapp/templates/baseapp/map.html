@@ -1,0 +1,36 @@
+{% extends "baseapp/base.html" %}
+{% load static %}
+{% block main_content %}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+<style>
+    #map { height: 90vh; width: 100%; }
+    button { width: 100%; }
+</style>
+
+<!-- Map Container -->
+<div id="map"></div>
+<button onclick = 'window.location = {% url "baseapp:upload" %}'>Upload</button>
+
+<!-- Leaflet JS -->
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+
+<script>
+    // Initialize the map centered at a default location
+    var map = L.map('map').setView([23.7277, 90.4135], 13);
+
+    // Add OpenStreetMap tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    {% for d in data %}
+    L.marker({{d.location}}).addTo(map)
+        .bindPopup("<b>{{d.name}}</b><br>{{d.description}}")
+        .openPopup();
+    {% endfor %}
+</script>
+
+{% endblock main_content %}
+
+{% block title %}Map{% endblock title %}

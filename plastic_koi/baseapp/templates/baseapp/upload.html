@@ -1,0 +1,117 @@
+{% extends "baseapp/base.html" %}
+{% load static %}
+{% block main_content %}
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+    body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .upload-form {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5)
+    }
+    .upload-part {
+        border: 2px solid blue;
+    }
+    .upload-part #previewContainer {
+        width: 100%;
+        height: 150px;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;        
+    }
+
+    .upload-part #previewContainer img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+</style>
+
+<form method="post" enctype="multipart/form-data" class="upload-form">
+    {% csrf_token %}
+    <h2>Upload</h2>
+    <input id="location_input" type="hidden" name="location">
+    <label>Your Name</label>
+    <input type="text" name="name">
+    <label>Description</label>
+    <textarea name="des"></textarea>
+    <label>Upload photo</label>
+    <div class="upload-part">
+        <input type="file" name="image" id="fileInput" accept="image/*" multiple>
+        <div id="previewContainer"></div>
+    </div>
+    <input type="submit" value="Upload">
+</form>
+
+
+
+
+<script>
+    document.getElementById('fileInput').addEventListener('change', function(event) {
+        const files = event.target.files; // Get the selected files
+        const previewContainer = document.getElementById('previewContainer');
+        
+        // Clear any previous previews
+        previewContainer.innerHTML = '';
+    
+        Array.from(files).forEach(file => {
+            if (file.type.startsWith('image/')) { // Check if the file is an image
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Create an img element for each image
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.classList.add('preview-image');
+                    
+                    // Append the preview image to the container
+                    previewContainer.appendChild(img);
+                };
+                reader.readAsDataURL(file); // Read each image file as a Data URL
+            }
+        });
+    });
+
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var lat = position.coords.latitude;
+                var lon = position.coords.longitude;
+    
+                // Log the location to the console
+                console.log("Latitude: " + lat + ", Longitude: " + lon);
+                document.getElementById("location_input").value = lat + " " + lon ;
+                
+                // You can use lat and lon here for other purposes if needed (e.g., storing, sending to a server, etc.)
+            }, function(error) {
+                alert("Error getting location: " + error.message);
+            }, {
+                enableHighAccuracy: true,  // Get a more precise location
+                timeout: 5000,            // Wait 5 seconds before giving up
+                maximumAge: 0             // Don't use cached location
+            });
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+    getLocation() ;
+    
+</script>
+
+{% endblock main_content %}
+
+{% block title %}Upload{% endblock title %}
